@@ -16,7 +16,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.podbean.app.podcast"
+        applicationId "com.salmonapps.app.podcast"
         minSdkVersion 15
         targetSdkVersion 19
         versionCode 148
@@ -29,13 +29,13 @@ android {
     }
     productFlavors {
         staging {
-            applicationId "org.podbean.app.podcast"
+            applicationId "org.salmonapps.app.podcast"
         }
         jacky {
-            applicationId "org.podbean.app.podcast"
+            applicationId "org.salmonapps.app.podcast"
         }
         production {
-            applicationId "com.podbean.app.podcast"
+            applicationId "com.salmonapps.app.podcast"
         }
     }
     buildTypes {
@@ -80,10 +80,10 @@ android {
     signingConfigs {
         debug { storeFile file('./debug.keystore') }
         release {
-            storeFile file('../keystore/podbean.jks')
-            keyAlias 'podbean'
-            keyPassword '12347890'
-            storePassword '123456'
+            storeFile file('../keystore/salmonapps.jks')
+            keyAlias 'salmonapps'
+            keyPassword '*'
+            storePassword '*'
         }
     }
 
