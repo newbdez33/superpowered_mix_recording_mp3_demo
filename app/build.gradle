@@ -1,0 +1,115 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        //noinspection GradleDynamicVersion
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.podbean.app.podcast"
+        minSdkVersion 15
+        targetSdkVersion 19
+        versionCode 148
+        versionName "1.4.8"
+
+        sourceSets.main {
+            jniLibs.srcDir 'src/main/libs'
+            jni.srcDirs = []
+        }
+    }
+    productFlavors {
+        staging {
+            applicationId "org.podbean.app.podcast"
+        }
+        jacky {
+            applicationId "org.podbean.app.podcast"
+        }
+        production {
+            applicationId "com.podbean.app.podcast"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        proguard {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    task ndkBuild(type: Exec) {
+        //for mac
+        //commandLine '/Users/z33/Library/Android/ndk/ndk-build', '-B', '-C', file('src/main/jni').absolutePath
+        //for windows
+        //commandLine 'D:\\DevEnv\\AndroidNDK\\android-ndk-r10e\\ndk-build.cmd', '-B', '-C', file('src/main/jni').absolutePath
+
+        def localProperties = new Properties()
+        localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def ndkDir = localProperties.getProperty('ndk.dir')
+        def ndkBuildPrefix = ndkDir != null ? ndkDir + '/' : '';
+
+        if (ant.properties.os == 'windows') {
+            commandLine ndkBuildPrefix + 'ndk-build.cmd', '-B', '-C', file('src/main/jni').absolutePath
+        } else {
+            commandLine ndkBuildPrefix + 'ndk-build', '-B', '-C', file('src/main/jni').absolutePath
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
+    compileOptions {
+    }
+    signingConfigs {
+        debug { storeFile file('./debug.keystore') }
+        release {
+            storeFile file('../keystore/podbean.jks')
+            keyAlias 'podbean'
+            keyPassword '12347890'
+            storePassword '123456'
+        }
+    }
+
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.0.0'
+    //compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.jakewharton:disklrucache:2.0.2'
+    compile 'commons-io:commons-io:2.4'
+    compile('io.nlopez.smartlocation:library:3.0.11') {
+        transitive = false
+    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+        transitive = true;
+    }
+    compile files('libs/universal-image-loader-1.9.4.jar')
+}
