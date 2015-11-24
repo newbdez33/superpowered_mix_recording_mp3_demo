@@ -1,0 +1,2 @@
+# superpowered_mix_recording_mp3_demo
+Android混音录音成mp3的demo，不是完整项目不可运行。当然c++代码也同样适用于iOS
